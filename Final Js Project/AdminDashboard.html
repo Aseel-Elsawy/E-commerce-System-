@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swiss Arabian</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="AdminDashboard.css">
+  <script src="./jq-3-7-1.js"></script>
+  <script src="AdminDashboard.js" defer ></script>
+   
+    
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <img src="../image/logo3.png" alt="Logo">
+    </div>
+    <ul>
+      <li><a href="admin.html" class="nav-link">Dashboard Overview</a></li>
+      <li><a href="ManageUsers.html" class="nav-link">Manage Users</a></li>
+      <li><a href="ManageSellers.html" class="nav-link">Manage Sellers</a></li>
+      <li><a href="AdminManageProduct.html" class="nav-link">Manage Products</a></li>
+      <li><a href="customerservice.html" class="nav-link">Customer Service</a></li>
+      <li><a href="AddAdmins.html" class="nav-link">Add New Admins</a></li>
+    </ul>
+    <div class="footer">
+      <p>&copy; 2024 Dashboard</p>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <div class="navbar-custom">
+    <button class="toggle-btn" id="toggle-btn">☰</button>
+    <h5>Welcome, Seller</h5>
+  </div>
+
+  <!-- Main Content -->
+<div class="main-content">
+  <div class="grid-container">
+    <div class="grid-item">
+      <h5>Total Products</h5>
+      <p>50</p>
+    </div>
+    <div class="grid-item">
+      <h5>Total Orders</h5>
+      <p>120</p>
+    </div>
+    <div class="grid-item">
+      <h5>Sales Analytics</h5>
+      <p>$10,000</p>
+    </div>
+    <div class="grid-item">
+      <h5>Pending Orders</h5>
+      <p>8</p>
+    </div>
+    <!-- Best Seller (taking full width) -->
+    <div class="grid-item full-width">
+      <h3>Best Seller</h3>
+      <div class="best-seller-card">
+        <img id="best-seller-image" src="" alt="Best Seller">
+        <div>
+          <h5 id="best-seller-name"></h5>
+          <p id="best-seller-sales"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  
+</body>
+</html>
