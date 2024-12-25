@@ -1,20 +1,11 @@
 $(function () {
     const user = JSON.parse(localStorage.getItem("loggedinUser"));
-    if (user) {
-        if (user.role !== "Customer") {
-            alert("You don't have access here");
-            window.location.href = window.location.origin + '/role.html';
-            return;
-        }
-    } else {
-        alert("Please login");
-        window.location.href = window.location.origin + '/login.html';
-        return;
+    if (!checkuser(user, "Customer")) {
+        return; 
     }
-
     const ClientId = user.id;
-    let cart = JSON.parse(localStorage.getItem("Cart"));
-    let products = JSON.parse(localStorage.getItem("Products"));
+    let cart = JSON.parse(localStorage.getItem("Cart"))||[];
+    let products = JSON.parse(localStorage.getItem("Products"))||[];
 
     if (!products) {
         console.log("No products found in local storage.");
@@ -45,6 +36,13 @@ $(function () {
         let GetProduct = products.find(function (product) {
             return product.ProductId === productId;
         });
+        if (!GetProduct) {
+            cart = cart.filter(function(product) {
+                return !(product.ProductId === selectedProduct.ProductId && product.ClientId === ClientId);
+            });
+            localStorage.setItem("Cart", JSON.stringify(cart));
+            return; 
+        }
 
         itemQuantity += Number(selectedProduct.quantity);
 
@@ -102,8 +100,8 @@ $(function () {
     $('input, select').on('input', function () {
         let $input = $(this);
         if ($input.attr('id') === 'firstName'||$input.attr('id') === 'lastName') {
-            let namePattern = /^[A-Za-z\s]+$/;
-            validateInput($input, namePattern, 'Name Contain only letters');
+            let namePattern =  /^[A-Za-z]{2,}(?:\s[A-Za-z]{2,})*$/;
+            validateInput($input, namePattern, 'Name Contain only letters and should be more than 2');
         } 
         else if ($input.attr('id') === 'email') {
             let emailPattern = /^[^\s@]+@gmail\.com$/;
@@ -124,11 +122,17 @@ $(function () {
     
         if(filteredCart.length===0)
         {
-            alert("please select product to checkout");
-            window.location.href = window.location.origin + '/landscape/landscape.html';
+            Swal.fire({
+                icon: 'warning',
+                title: "please select product to checkout",
+                
+                showConfirmButton: true
+            }).then(() => {
+                window.location.href = '/landscape/landscape.html';
+            });
             return;
         }
-        products = JSON.parse(localStorage.getItem("Products"));
+        products = JSON.parse(localStorage.getItem("Products"))||[];
         let isStockValid = true;
         filteredCart.forEach(function (selectedProduct) {
             let productId = selectedProduct.ProductId;
@@ -136,7 +140,11 @@ $(function () {
                 return product.ProductId === productId;
             });
             if (!currentProduct || currentProduct.quantity < selectedProduct.quantity) {
-                alert(` Sorry... The product is no longer available in the required quantity .`);
+                Swal.fire({
+                    icon: 'warning',
+                    title: "Sorry No more stock available for this product",
+                    showConfirmButton: true
+                });
                 isStockValid = false;
                 return false;
             }
@@ -171,9 +179,12 @@ $(function () {
                     });
 
                     return {
-                        ProductId: selectedProduct.ProductId,
+                        ProductId: GetProduct.ProductId,
                         quantity: selectedProduct.quantity,
                         price: GetProduct.price,
+                        image:GetProduct.image,
+                        name:GetProduct.name,
+                        SellerId:GetProduct.SellerId,
                         status: 0
                     };
                 })

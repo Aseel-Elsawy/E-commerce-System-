@@ -141,11 +141,16 @@
   padding-top: 50px;
  }
 
- #logout:hover
+ .trash:hover
   {
     cursor: pointer;
-    background-color: rgba(255, 0, 0, 0.415);
-    color: var(--primary-color);
+    color: rgb(153, 3, 3);
+    scale: 1.2;
+  }
+
+  .trash
+  {
+    cursor: pointer;
   }
   
  

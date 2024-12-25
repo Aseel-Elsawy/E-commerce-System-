@@ -18,7 +18,7 @@ document.getElementById("signupForm").addEventListener("submit", function (event
         displayError("name", "Please enter a valid Name.");
         isValid = false;
     }
-
+    
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const emailExists = users.some(user => user.email === email);
     if (emailExists) {
@@ -54,7 +54,12 @@ document.getElementById("signupForm").addEventListener("submit", function (event
         localStorage.setItem("loggedinUser", JSON.stringify(user));
       
         if (role === "Customer") {
-            window.location.href = window.location.origin + '/landscape/landscape.html';
+         /*   users.push(user);
+        localStorage.setItem("users", JSON.stringify(users));
+    
+        localStorage.removeItem("loggedinUser");
+        localStorage.setItem("loggedinUser", JSON.stringify(user));*/
+            window.location.href = './landscape/landscape.html';
         } else if (role === "Seller") {
             window.location.href = "seller_profile.html";
         }
@@ -78,6 +83,6 @@ function displayError(inputId, message) {
     inputElement.insertAdjacentElement("afterend", errorElement);
 }
 function validateEmail(email) {
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    const emailPattern = /^[^\s@]+@gmail\.com$/;
     return emailPattern.test(email);
 }

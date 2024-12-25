@@ -71,6 +71,6 @@ body {
     }
 
     .dashboard {
-        grid-template-columns: 1fr; /* Stacks charts in one column on smaller screens */
+        grid-template-columns: 1fr; 
     }
 }

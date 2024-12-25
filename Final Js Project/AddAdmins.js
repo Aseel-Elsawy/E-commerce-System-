@@ -27,15 +27,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
-    if (!email || !password) {
-      alert("Please enter both email and password!");
+   
+    if (!validateEmail(email) || !password) {
+      Swal.fire({
+        icon: 'error',
+        title: "Please enter both email and password in correct form!",
+        showConfirmButton: true
+          });
       return;
     }
 
  
     const existingUser = users.find(user => user.email === email);
     if (existingUser) {
-      alert("This email is already registered!");
+      Swal.fire({
+        icon: 'error',
+        title: "This email is already registered!",
+        showConfirmButton: true
+          });
       return;
     }
 
@@ -54,8 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
   
     emailInput.value = "";
     passwordInput.value = "";
-
-    alert("Admin added successfully!");
+    Swal.fire({
+      icon: 'success',
+      title: "Admin added successfully!",
+      showConfirmButton: true
+        });
   }
 
  
@@ -64,7 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
  
   const loggedInUser = JSON.parse(localStorage.getItem("loggedinUser"))||[];
   if (!loggedInUser || loggedInUser.role !== "Admin") {
-      alert("You are not authorized to access this page. Redirecting to login...");
+    Swal.fire({
+      icon: 'error',
+      title: "You are not authorized to access this page. Redirecting to login...",
+      showConfirmButton: true
+        });
       window.location.href = "login.html";
       return;
   }
@@ -77,3 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = '../login.html';
   });
 });
+function validateEmail(email) {
+  const emailPattern = /^[^\s@]+@gmail\.com$/;
+  return emailPattern.test(email);
+}

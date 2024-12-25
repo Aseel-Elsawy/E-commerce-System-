@@ -58,15 +58,26 @@ document.addEventListener("DOMContentLoaded", () => {
     function toggleSellerStatus(sellerId) {
       const seller = users.find(user => user.id == sellerId);
       if (!seller) {
-        alert("Seller not found!");
+        
+          Swal.fire({
+              icon: 'error',
+              title: "Seller not found!",
+              showConfirmButton: true
+                });
+        //alert("Seller not found!");
         return;
       }
   
    
       seller.status = seller.status === "active" ? "not active" : "active";
       localStorage.setItem("users", JSON.stringify(users));
-  
-      alert(`Seller ${seller.name} status updated to ${seller.status}`);
+      Swal.fire({
+        icon: 'success',
+        title: `Seller ${seller.name} status updated to ${seller.status}`,
+        showConfirmButton: true
+       });
+
+      //alert(`Seller ${seller.name} status updated to ${seller.status}`);
       renderSellers(searchInput.value);
     }
   
@@ -74,7 +85,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function deleteSeller(sellerId) {
       const seller = users.find(user => user.id == sellerId);
       if (!seller) {
-        alert("Seller not found!");
+        Swal.fire({
+          icon: 'error',
+          title: "Seller not found!",
+          showConfirmButton: true
+            });
+        //alert("Seller not found!");
         return;
       }
   
@@ -86,23 +102,48 @@ document.addEventListener("DOMContentLoaded", () => {
       const remainingProducts = products.filter(product => product.SellerId != sellerId);
       localStorage.setItem("Products", JSON.stringify(remainingProducts));
   
-      
+     /* 
       const updatedOrders = orders.filter(order => {
-        const filteredItems = order.items.filter(item => item.sellerId != sellerId);
+        const filteredItems = order.items.filter(item => item.SellerId != sellerId);
         if (filteredItems.length > 0) {
+          const newTotal = filteredItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+          order.total = newTotal;
             order.items = filteredItems; 
             return true;
         }
         return false;
-    });
+    });*/
+    const updatedOrders = orders.filter(order => {
+      
+      if (order.status === 1) {
+          return true; 
+      }
+  
+      const filteredItems = order.items.filter(item => {
+          return item.status !== 1 && item.SellerId !== sellerId;
+      });
+  
+      if (filteredItems.length > 0) {
+          const newTotal = filteredItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+          
+          order.items = filteredItems; 
+          order.total = newTotal; 
+          return true;
+      }
+      return false;
+  });
       localStorage.setItem("Orders", JSON.stringify(updatedOrders));
   
    
       const sellerIndex = users.indexOf(seller);
       users.splice(sellerIndex, 1);
       localStorage.setItem("users", JSON.stringify(users));
-  
-      alert("Seller and related data deleted successfully!");
+      Swal.fire({
+        icon: 'success',
+        title: "Seller and related data deleted successfully!",
+        showConfirmButton: true
+          });
+      //alert("Seller and related data deleted successfully!");
       renderSellers(searchInput.value);
     }
   
@@ -134,8 +175,13 @@ document.addEventListener("DOMContentLoaded", () => {
    
     const loggedInUser = JSON.parse(localStorage.getItem("loggedinUser"))||[];
     if (!loggedInUser || loggedInUser.role !== "Admin") {
-        alert("You are not authorized to access this page. Redirecting to login...");
-        window.location.href = "login.html";
+      Swal.fire({
+        icon: 'error',
+        title: "You are not authorized to access this page. Redirecting to login...",
+        showConfirmButton: true
+          });
+        //alert("You are not authorized to access this page. Redirecting to login...");
+        window.location.href = "/login.html";
         return;
     }
 
@@ -145,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutLink.addEventListener('click', (event) => {
         event.preventDefault();
         localStorage.removeItem('loggedinUser');
-        window.location.href = '../login.html';
+        window.location.href = '/login.html';
     });
   
     

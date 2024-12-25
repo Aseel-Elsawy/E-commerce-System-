@@ -6,7 +6,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
     if (!loggedInUser || loggedInUser.role !== "Seller") {
-        alert("You are not authorized to access this page. Redirecting to login...");
+        Swal.fire({
+            icon: 'error',
+            title: "You are not authorized to access this page. Redirecting to login...",
+            showConfirmButton: true
+              });
+        //alert("You are not authorized to access this page. Redirecting to login...");
         window.location.href = "login.html";
         return;
     }
@@ -28,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const phone = document.getElementById("phone").value.trim();
         const nationalId = document.getElementById("nationalId").value.trim();
         const bankAccount = document.getElementById("bankAccount").value.trim();
-        const password = document.getElementById("password").value.trim();
+       const password = document.getElementById("password").value.trim();
         const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
         let isValid = true;
@@ -81,13 +86,18 @@ document.addEventListener("DOMContentLoaded", function () {
             loggedInUser.nationalId = nationalId;
             loggedInUser.bankAccount = bankAccount;
 
-            if (password) {
-                loggedInUser.password = CryptoJS.SHA256(password).toString();
+           if (password) {
+               loggedInUser.password = CryptoJS.SHA256(password).toString();
             }
 
             if (loggedInUser.status !== "active") {
                 loggedInUser.status = "not active";
-                alert("Your registration request has been submitted. Please try logging in after 24 hours.");
+                Swal.fire({
+                    icon: 'success',
+                    title: "Your registration request has been submitted. Please try logging in after 24 hours.",
+                    showConfirmButton: true
+                      });
+                //alert("Your registration request has been submitted. Please try logging in after 24 hours.");
             }
 
           
@@ -108,4 +118,22 @@ document.addEventListener("DOMContentLoaded", function () {
         errorElement.textContent = message;
         errorMessagesDiv.appendChild(errorElement);
     }
+    //
+    window.onbeforeunload = function () {
+        const loggedinUser = JSON.parse(localStorage.getItem("loggedinUser")) || null;
+    
+        if (loggedinUser && !loggedinUser.status) {
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+            const updatedUsers = users.filter(user => user.id !== loggedinUser.id);
+            localStorage.setItem("users", JSON.stringify(updatedUsers));
+    
+            localStorage.removeItem("loggedinUser");
+    
+            console.log("User removed-incomplete profile.");
+        }
+    
+        return undefined;
+    };
+    
+    //
 });

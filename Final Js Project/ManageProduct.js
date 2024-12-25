@@ -8,7 +8,7 @@ toggleBtn.addEventListener("click", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     const links = document.querySelectorAll(".nav-link");
-  
+
     links.forEach(link => {
         if (link.href === window.location.href) {
             link.classList.add("active");
@@ -16,14 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const currentUser = JSON.parse(localStorage.getItem('loggedinUser'));
-    if (!currentUser || currentUser.role !== "Seller") {
-        alert("You are not authorized to access this page. Redirecting to login...");
-        window.location.href = "login.html";
-        return;
-    }
+    checkuser(currentUser, "Seller");
+
 
     const form = document.getElementById("add-product-form");
-    const productList = document.getElementById("product-list"); 
+    const productList = document.getElementById("product-list");
     const popupFormContainer = document.getElementById("popup-form-container");
     const closePopupBtn = document.getElementById("close-popup-btn");
     const showFormBtn = document.getElementById("show-form-btn");
@@ -32,14 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const SellerId = loggedInUser.id;
     const sellerName = loggedInUser.name || 'Seller';
 
-    
+
     document.querySelector('.navbar-custom h5').textContent = `Welcome, ${sellerName}`;
 
-   
+
     const PRODUCTS_KEY = "Products";
     const ORDERS_KEY = "Orders";
 
-   
+
     const generateUniqueId = () => `product_${Date.now()}`;
 
 
@@ -47,10 +44,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const saveProducts = (products) => localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
 
-  
+
     const getOrders = () => JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
 
-  
+
     const saveOrders = (orders) => localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
 
 
@@ -60,10 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("form-header").innerText = "Add Product";
         document.getElementById("product-submit").innerText = "Add Product";
         form.dataset.ProductId = "";
-        form.dataset.ExistingImage = ""; 
+        form.dataset.ExistingImage = "";
     });
 
- 
+
     closePopupBtn.addEventListener("click", () => {
         popupFormContainer.style.display = "none";
     });
@@ -78,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         const productName = document.getElementById("product-name").value;
         const productPrice = document.getElementById("product-price").value;
-        const productImgFile = document.getElementById("product-img").files[0]; 
+        const productImgFile = document.getElementById("product-img").files[0];
         const productCategory = document.getElementById("product-category").value;
         const productQuantity = document.getElementById("product-quantity").value;
 
@@ -87,21 +84,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const existingProductIndex = products.findIndex((p) => p.ProductId === ProductId);
 
         if (!form.dataset.ProductId && (!productImgFile || !productImgFile.type.startsWith("image/"))) {
-            alert("Please upload a valid image for the product.");
+            Swal.fire({
+                icon: 'warning',
+                title: "Please upload a valid image for the product.",
+                showConfirmButton: true
+            });
             return;
         }
 
-      
+
         let productImage = form.dataset.ExistingImage;
         if (productImgFile && productImgFile.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = () => {
-                productImage = reader.result; 
-                saveOrUpdateProduct(); 
+                productImage = reader.result;
+                saveOrUpdateProduct();
             };
             reader.readAsDataURL(productImgFile);
         } else {
-            saveOrUpdateProduct(); 
+            saveOrUpdateProduct();
         }
 
         function saveOrUpdateProduct() {
@@ -116,10 +117,10 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             if (existingProductIndex >= 0) {
-               
+
                 products[existingProductIndex] = newProduct;
             } else {
-                
+
                 products.push(newProduct);
             }
 
@@ -131,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const renderProducts = () => {
         productList.innerHTML = "";
-        const products = getProducts().filter((p) => p.SellerId === SellerId); 
+        const products = getProducts().filter((p) => p.SellerId === SellerId);
 
         products.forEach((product) => {
             const row = document.createElement("tr");
@@ -152,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
             productList.appendChild(row);
         });
 
-      
+
         document.querySelectorAll(".update-btn").forEach((button) => {
             button.addEventListener("click", (e) => {
                 const ProductId = e.target.dataset.productId;
@@ -167,33 +168,39 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("product-img").value = "";
                     document.getElementById("product-submit").innerText = "Update";
 
-                    
-                    form.dataset.ProductId = product.ProductId; 
-                    form.dataset.ExistingImage = product.image; 
+
+                    form.dataset.ProductId = product.ProductId;
+                    form.dataset.ExistingImage = product.image;
 
                     popupFormContainer.style.display = "flex";
                 }
             });
         });
 
-        
+
         function deleteProductFromOrders(ProductId) {
             const orders = getOrders();
 
             orders.forEach(order => {
-          
+
                 if (order.status === 0) {
+                    const product = order.items.find(item => item.ProductId === ProductId);
+
+                    if (product) {
+                        const { price, quantity } = product; 
+                        order.total -= price * quantity; // Subtract from total
+                    }
                     order.items = order.items.filter(item => item.ProductId !== ProductId);
-                   
+
+
                     if (order.items.length === 0) {
                         const orderIndex = orders.indexOf(order);
-                        orders.splice(orderIndex, 1); 
+                        orders.splice(orderIndex, 1);
                     }
                 }
             });
 
             saveOrders(orders);
-            console.log("Final orders:", orders); 
         }
 
 
@@ -201,23 +208,36 @@ document.addEventListener("DOMContentLoaded", () => {
             button.addEventListener("click", (e) => {
                 const ProductId = e.target.dataset.productId;
                 const productName = getProducts().find((p) => p.ProductId === ProductId);
-
-             
-                if (confirm(`Are you sure you want to delete "${productName.name}"?`)) {
-              
-                    const products = getProducts().filter((p) => p.ProductId !== ProductId);
-                    saveProducts(products);
-
-                  
-                    deleteProductFromOrders(ProductId);
-
-                  
-                    renderProducts();
-                }
+        
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you really want to delete "${productName.name}"? This action cannot be undone!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const products = getProducts().filter((p) => p.ProductId !== ProductId);
+                        saveProducts(products);
+        
+                        deleteProductFromOrders(ProductId);
+        
+                        renderProducts(); 
+        
+                        Swal.fire(
+                            'Deleted!',
+                            `"${productName.name}" has been deleted.`,
+                            'success'
+                        );
+                    }
+                });
             });
         });
+        
     };
 
-  
+
     renderProducts();
 });

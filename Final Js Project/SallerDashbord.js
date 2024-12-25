@@ -10,23 +10,16 @@ function getLocalStorageData(key) {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : [];
 }
-
+//get from localstorage func
 function updateDashboardMetrics() {
     const products = getLocalStorageData('Products');
     const orders = getLocalStorageData('Orders');
-    const currentUser = getLocalStorageData('loggedinUser') || { id: "unknown", name: "Guest" };
-
-    if (!currentUser || !currentUser.id) {
-        console.error("No valid 'LoggedInUser' found in localStorage");
-        return;
-    }
+    const currentUser = getLocalStorageData('loggedinUser')||[];
 
     const SellerId = currentUser.id; 
 
-   
     const sellerProducts = products.filter(product => product.SellerId === SellerId);
 
-  
     let sellerOrderCount = 0;
     let sellerTotalSales = 0;
     let sellerPendingOrders = 0;
@@ -49,7 +42,7 @@ function updateDashboardMetrics() {
    
     document.querySelector('.grid-item:nth-child(1) p').textContent = sellerProducts.length; 
     document.querySelector('.grid-item:nth-child(2) p').textContent = sellerOrderCount; 
-    document.querySelector('.grid-item:nth-child(3) p').textContent = `$${sellerTotalSales.toFixed(2)}`; 
+    document.querySelector('.grid-item:nth-child(3) p').textContent = `£${sellerTotalSales.toFixed(2)}`; 
     document.querySelector('.grid-item:nth-child(4) p').textContent = sellerPendingOrders;
 
    
@@ -79,7 +72,7 @@ function displayBestSeller(products, orders, SellerId) {
     if (!mostOrderedProductId || productOrderCounts[mostOrderedProductId] === 0) {
         document.getElementById("best-seller-name").textContent = "No Best Seller";
         document.getElementById("best-seller-sales").textContent = "No orders found.";
-        document.getElementById("best-seller-image").alt = "default-image.webp"; 
+        document.getElementById("best-seller-image").alt = " "; 
         return;
     }
 
@@ -115,9 +108,5 @@ document.addEventListener("DOMContentLoaded", () => {
     const SellerId = currentUser.id; 
     displayBestSeller(products, orders, SellerId);
    
-    if (!currentUser || currentUser.role !== "Seller") {
-        alert("You are not authorized to access this page. Redirecting to login...");
-        window.location.href = "login.html";
-        return;
-    }
+    if (!checkuser(currentUser, "Seller"));
 });

@@ -87,7 +87,12 @@ const updateProductStatus = (orderId) => {
 
    
     if (order.status === 1) {
-        alert("This order has already been shipped.");
+        Swal.fire({
+            icon: 'success',
+            title: "This order has already been shipped.",
+            showConfirmButton: true
+        });
+    
         return;
     }
 
@@ -100,15 +105,10 @@ const updateProductStatus = (orderId) => {
     });
 
    
-    const allShipped = order.items
-        .filter(item => {
-            const product = products.find(p => p.ProductId === item.ProductId);
-            return product && product.SellerId === sellerId;
-        })
-        .every(item => item.status === 1);
+    const allShipped = order.items.every(item => item.status === 1);
 
     if (allShipped) {
-        order.status = 1; 
+        order.status = 1; 
     }
 
     saveOrders(orders);
@@ -129,11 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
   
-    const currentUser = JSON.parse(localStorage.getItem('loggedinUser'));
-    if (!currentUser || currentUser.role !== "Seller") {
-        alert("You are not authorized to access this page. Redirecting to login...");
-        window.location.href = "../trial/login.html";
-        return;
-    }
+    
     renderOrders(); 
+    const currentUser = JSON.parse(localStorage.getItem('loggedinUser'));
+    if (!checkuser(currentUser, "Seller"));
 });

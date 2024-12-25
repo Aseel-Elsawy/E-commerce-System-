@@ -1,20 +1,8 @@
 $(function () {
-  const user = JSON.parse(localStorage.getItem("loggedinUser"));
-  if(user)
-    {
-      if(user.role!=="Customer")
-      {
-        alert("you don't have access here");
-        window.location.href =window.location.origin + '/role.html';
-        return;
-      }
-    }
-    else
-    {
-        alert("please login");
-        window.location.href =window.location.origin + '/login.html';
-        return;
-    }
+  const user = JSON.parse(localStorage.getItem("loggedinUser"))||[];
+  if (!checkuser(user, "Customer")) {
+    return; 
+}
   $("#ForHerNav, #ForHimNav").click(function () {
     const category = this.dataset.category;   
     localStorage.setItem('SelectedCategory', category); 
@@ -94,7 +82,13 @@ $(function () {
       return;
     }
     
-    
+    cart = cart.filter(function (selectedProduct) {
+      return products.some(function (product) {
+        return product.ProductId === selectedProduct.ProductId;
+      });
+    });
+  
+    localStorage.setItem("Cart", JSON.stringify(cart));
    
     let cartTableBody = $("#cart tbody");
     cartTableBody.empty();
@@ -117,6 +111,7 @@ $(function () {
         });
         localStorage.setItem("Cart", JSON.stringify(cart));
     displayCart();
+    return;
       
       }
     
@@ -220,6 +215,15 @@ $(function () {
       localStorage.setItem("Cart", JSON.stringify(cart));  
     }
   }
-
+  
   displayCart();
+  const logoutLink = $("#logout");
+
+  logoutLink.click(function (event) {
+   
+    event.preventDefault();
+    localStorage.removeItem("loggedinUser");
+    window.location.href = "../login.html";
+  });
+  
 });

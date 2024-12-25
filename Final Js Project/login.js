@@ -6,8 +6,11 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
     const password = document.getElementById("password").value.trim();
 
    
-    const adminEmail = "admin@swissarabian.com";
+    const adminEmail = "admin@gmail.com";
     const adminPassword = CryptoJS.SHA256("admin123").toString();
+    //fixed saller
+    const sellerEmail = "seller@gmail.com";
+    const sellerPassword = CryptoJS.SHA256("seller123").toString();
 
     let isValid = true;
 
@@ -18,7 +21,8 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
     if (!email) {
         displayError("email", "Email is required.");
         isValid = false;
-    } else if (!validateEmail(email)) {
+    } 
+    else if (!validateEmail(email)) {
         displayError("email", "Please enter a valid email address.");
         isValid = false;
     }
@@ -44,7 +48,20 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
             localStorage.setItem("loggedinUser", JSON.stringify(user));
     
             window.location.href = "admin.html";
-        } else {
+        }
+        else if (email === sellerEmail && hashedPassword === sellerPassword) {
+            const userId = 'user1';
+            const hashedPassword = CryptoJS.SHA256(password).toString();
+            const registrationDate = new Date().toISOString();
+            const userRole = "Seller";
+            const user = { id: userId, name: "Seller", email, password: hashedPassword, role: userRole, registrationDate };
+            localStorage.removeItem("loggedinUser");
+            localStorage.setItem("loggedinUser", JSON.stringify(user));
+
+            window.location.href = "SallerDashbord.html";
+
+        }
+         else {
             const users = JSON.parse(localStorage.getItem("users")) || [];
             const user = users.find(user => user.email === email && user.password === hashedPassword);
     
@@ -62,8 +79,12 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
                         window.location.href = window.location.origin +'/SallerDashbord.html';
                     } 
                     else {
-                      
-                        alert("Your account is not active yet. Please try again later.");
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Your account is not active yet. Please try again later.",
+                            showConfirmButton: true
+                              });
+                        //alert("Your account is not active yet. Please try again later.");
                     }
                 }
                 else if (user.role === "Admin") {
@@ -97,6 +118,6 @@ function displayError(inputId, message) {
 }
 
 function validateEmail(email) {
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    const emailPattern = /^[^\s@]+@gmail\.com$/;
     return emailPattern.test(email);
 }

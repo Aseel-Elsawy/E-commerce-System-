@@ -1,16 +1,6 @@
 $(function () {
     const user = JSON.parse(localStorage.getItem("loggedinUser"));
-    if (user) {
-        if (user.role !== "Customer") {
-            alert("You don't have access here");
-            window.location.href = window.location.origin + "/role.html";
-            return;
-        }
-    } else {
-        alert("Please login");
-        window.location.href = window.location.origin + "/login.html";
-        return;
-    }
+    checkuser(user,"Customer");
     const ClientId = user.id;
     $("#ForHerNav, #ForHimNav").click(function () {
         const category = this.dataset.category;   
@@ -96,35 +86,28 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
          let orderstatus = $("<h4>").text("Your Order is:"+status);
         let orderHeader = $("<h6>")
         .text("Order Number: " + order.id)
-        .append($("<br>"))
-        .append("Date: " + order.date);
+       
+        let OrderDate =$("<h6>").text("Date: " + order.date);
         let productList = $("<ul>").addClass("list-group mb-3");
       
         let total = 0;
 
         order.items.forEach(function (item) {
             let productId = item.ProductId;
-            let GetProduct = products.find(function (product) {
-                return product.ProductId === productId;
-            });
-
-            if (!GetProduct) {
-                console.log("Product not found in product list for ProductId:", productId);
-                return;
-            }
+      
 
             let productLi = $("<li>").addClass("list-group-item d-flex justify-content-between lh-sm");
             let divs = $("<div>");
-            let productName = $("<h6>").addClass("my-0 mb-3").text(GetProduct.name);
+            let productName = $("<h4>").addClass("my-0 mb-3").text(item.name);
 
             let img = $("<img>")
-                .attr("src", GetProduct.image)
-                .attr("alt", GetProduct.name)
+                .attr("src", item.image)
+                .attr("alt", item.name)
                 .addClass("Checkoutimages");
-            let price = $("<span>").text(GetProduct.price + " EGP");
-            let quantity = $("<h6>").text("Quantity: " + item.quantity);
+            let price = $("<span>").text(item.price + " EGP");
+            let quantity = $("<h4>").text("Quantity: " + item.quantity);
 
-            total += Number(GetProduct.price * item.quantity);
+            total += Number(item.price * item.quantity);
 
             divs.append(productName, img, quantity);
             productLi.append(divs, price);
@@ -137,7 +120,15 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
         totalLi.append(totalSpan, totalStrong);
         productList.append(totalLi);
 
-        orderDiv.append(orderstatus,orderHeader, productList);
+        orderDiv.append(orderstatus,orderHeader,OrderDate ,productList);
         wrapper.append(orderDiv);
+    });
+    const logoutLink = $("#logout");
+
+    logoutLink.click(function (event) {
+     
+      event.preventDefault();
+      localStorage.removeItem("loggedinUser");
+      window.location.href = "../login.html";
     });
 });

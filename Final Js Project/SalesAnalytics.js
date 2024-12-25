@@ -1,4 +1,3 @@
-
 const toggleBtn = document.getElementById("toggle-btn");
 const sidebar = document.getElementById("sidebar");
 
@@ -13,11 +12,19 @@ document.querySelector('.navbar-custom h5').textContent = `Welcome, ${currentUse
 const products = JSON.parse(localStorage.getItem('Products'))||[];
 const orders = JSON.parse(localStorage.getItem('Orders'))||[];
 
-const productLabels = products.map(product => product.name);
-const productQuantities = products.map(product => product.quantity);
 
 
-const orderStatuses = orders.flatMap(order => order.items.map(item => item.status));
+const productLabels = products.filter(product => product.SellerId === currentUser.id);
+const productQuantities = productLabels.map(product => product.quantity);
+
+const sellerOrders = orders.filter(order => 
+  order.items.some(item => {
+      const product = products.find(p => p.ProductId === item.ProductId);
+      return product && product.SellerId === currentUser.id;
+  })
+);
+
+const orderStatuses = sellerOrders.flatMap(order => order.items.map(item => item.status));
 const statusCounts = [0, 1].map(status => orderStatuses.filter(s => s === status).length);
 
 const chartColors = {
@@ -215,7 +222,7 @@ new Chart(revenueCtx, {
 });
 
 
-const stateData = orders.reduce((states, order) => {
+const stateData = sellerOrders.reduce((states, order) => {
     const state = order.state;
     if (states[state]) {
         states[state] += 1;
@@ -267,9 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
    
     const currentUser = JSON.parse(localStorage.getItem('loggedinUser'));
-    if (!currentUser || currentUser.role !== "Seller") {
-      alert("You are not authorized to access this page. Redirecting to login...");
-      window.location.href = "login.html";
-      return;
-  }
+    !checkuser(currentUser, "Seller");
 }); 
+
+

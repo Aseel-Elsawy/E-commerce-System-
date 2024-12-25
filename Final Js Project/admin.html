@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard Overview</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="admin.js" defer></script>
@@ -55,9 +55,23 @@
         <h5>Daily Signups</h5>
         <p id="daily-signups">0</p>
       </div>
-      <div class="grid-item full-width">
+      <div class="grid-item d-grid justify-content-center align-items-center">
+        <h3>Customer VS Seller</h3>
         <canvas id="registrations-chart"></canvas>
       </div>
+      <div class="grid-item d-grid justify-content-center align-items-center">
+        <h3>Sales Performance</h3>
+        <canvas id="sales-performance-chart"></canvas>
+    </div>
+    <div class="grid-item d-grid justify-content-center align-items-center">
+      <h3>Order Status</h3>
+        <canvas id="order-status-chart"></canvas>
+    </div>
+    <div class="grid-item d-grid justify-content-center align-items-center">
+      <h3>Top Products</h3>
+        <canvas id="top-products-chart"></canvas>
+    </div>
+    
     </div>
   </div>
 </body>

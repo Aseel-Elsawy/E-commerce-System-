@@ -9,8 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
     function checkUserRole(requiredRole) {
         const loggedInUser = JSON.parse(localStorage.getItem("loggedinUser"));
         if (!loggedInUser || loggedInUser.role !== requiredRole) {
-            alert("You don't have access here");
-            window.location.href = "signup.html";
+            Swal.fire({
+                icon: 'error',
+                title: "You are not authorized to access this page. Redirecting to login...",
+                showConfirmButton: true
+                  });
+            //alert("You don't have access here");
+            window.location.href = "/login.html";
         }
     }
     checkUserRole("Admin");
@@ -24,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const orders = JSON.parse(localStorage.getItem("Orders")) || [];
-    const products = JSON.parse(localStorage.getItem("products")) || [];
+    const products = JSON.parse(localStorage.getItem("Products")) || [];
 
     const usersTable = document.getElementById("user-table-body");
     const searchInput = document.getElementById("search-bar");
@@ -58,7 +63,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function deleteUser(userId) {
         const user = users.find(user => user.id == userId);
         if (!user) {
-            alert("User not found!");
+            Swal.fire({
+                icon: 'error',
+                title: "User not found!",
+                showConfirmButton: true
+                  });
+            //alert("User not found!");
             return;
         }
 
@@ -81,13 +91,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         localStorage.setItem("Orders", JSON.stringify(remainingOrders));
-        localStorage.setItem("products", JSON.stringify(products));
+        localStorage.setItem("Products", JSON.stringify(products));
 
         const userIndex = users.indexOf(user);
         users.splice(userIndex, 1);
         localStorage.setItem("users", JSON.stringify(users));
-
-        alert("User, their orders, and associated updates were handled successfully!");
+        Swal.fire({
+            icon: 'success',
+            title: "User, their orders, and associated updates were handled successfully",
+            showConfirmButton: true
+              });
+        //alert("User, their orders, and associated updates were handled successfully!");
         renderUsers(searchInput.value);
     }
 
@@ -108,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutLink.addEventListener('click', (event) => {
         event.preventDefault();
         localStorage.removeItem('loggedinUser');
-        window.location.href = '../login.html';
+        window.location.href = '/login.html';
     });
 
     renderUsers();

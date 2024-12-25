@@ -1,23 +1,9 @@
 
 $(function() {
 
-  const user =JSON.parse (localStorage.getItem("loggedinUser"));
-  if(user)
-    {
-      if(user.role!=="Customer")
-      {
-        alert("you don't have access here");
-        window.location.href =window.location.origin + '/role.html';
-        return;
-      }
-    }
-    else
-    {
-        alert("please login");
-        window.location.href =window.location.origin + '/login.html';
-        return;
-    }
-    const ClientId=user.id;
+  const user =JSON.parse (localStorage.getItem("loggedinUser"))||[];
+  
+    
       
     $("#ForHerNav, #ForHimNav").click(function () {
       const category = this.dataset.category;   
@@ -27,10 +13,14 @@ $(function() {
 
  
 
-  const userId=user.id;
+
   let contact=document.getElementById("Contact");
   contact.addEventListener("click",function(){
-    const contactdiv=document.createElement("div");
+    if (!checkuser(user,"Customer")) {
+      return; 
+  }
+  
+  const contactdiv=document.createElement("div");
     contactdiv.innerHTML=`
   <div class="modal" id="myModal">
   <div class="modal-dialog">
@@ -80,9 +70,10 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
       modal.hide();
     }
   });
+
   
   });
-    
+  const ClientId=user.id;
  let selectedProduct = JSON.parse(localStorage.getItem("SelectedProduct"));
  if (selectedProduct) {
     let mainsection = $("section");  
@@ -109,10 +100,9 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
      let increaseBtn = $("<button>").addClass("btn btn-sm btn-outline-secondary ms-2").text("+");
          if(selectedProduct.quantity<1)
      {
-         addToCartButton.addClass("disabled");
+         addToCartButton.addClass("disabled").text("Sold Out");;
          increaseBtn.addClass("disabled");
-       
-                addToCartButton.text("Sold Out");
+     
      }
      increaseBtn.click(function(){
       let currentvalue=Number(quantityInput.val());
@@ -141,6 +131,10 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
  });
  
  addToCartButton.click(function() {
+  if (!checkuser(user,"Customer")) {
+    return; 
+}
+const userId=user.id;
     let cart=localStorage.getItem("Cart")
     let productId = $(this).data("ProductId"); 
     let Quantity=Number(quantityInput.val());
@@ -168,7 +162,11 @@ if(exsistProduct)
    }
    else
    {
-    alert("No More Products In Stock No more stock available for this product!");
+    Swal.fire({
+      icon: 'warning',
+      title: "No more stock available for this product",
+      showConfirmButton: true
+  });
     return;
    }
     
@@ -180,7 +178,11 @@ else
 }
    
     localStorage.setItem("Cart", JSON.stringify(cart));
-    window.location.href = "cart.html";
+    Swal.fire({
+      icon: 'success',
+      title: "product has been added to you cart",
+      showConfirmButton: true
+  });
 });
            
           
@@ -195,5 +197,14 @@ else
      mainsection.append(row);
    
  }
+ const logoutLink = $("#logout");
+
+  logoutLink.click(function (event) {
+   
+    event.preventDefault();
+    localStorage.removeItem("loggedinUser");
+    window.location.href = "../login.html";
+  });
+  
 });
 

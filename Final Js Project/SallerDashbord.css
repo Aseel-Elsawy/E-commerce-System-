@@ -27,7 +27,7 @@ body {
   justify-content: space-between;
   padding: 10px 0;
   transition: transform 0.3s ease-in-out;
-  z-index: 1500;
+  z-index: 500;
 }
 
 .sidebar .logo {
@@ -69,7 +69,6 @@ body {
   background-color: var(--primary-color);
   color: var(--tertiary-color);
   border-radius: 16px 0px 0px 16px;
-  z-index: 1500;
 
 }
 

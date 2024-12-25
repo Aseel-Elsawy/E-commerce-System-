@@ -6,8 +6,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
     if (!loggedInUser) {
-        alert("You are not logged in. Redirecting to login...");
-        window.location.href = "login.html";
+        Swal.fire({
+            icon: 'error',
+            title: "You are not authorized to access this page. Redirecting to login...",
+            showConfirmButton: true
+              }).then(() => {
+        window.location.href = window.location.origin + '/login.html';
+    });
+       // alert("You are not logged in. Redirecting to login...");
+       
         return;
     }
 
@@ -83,8 +90,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
            
             localStorage.setItem("loggedinUser", JSON.stringify(loggedInUser));
-
-            alert("Profile updated successfully!");
+            Swal.fire({
+                icon: 'success',
+                title: "Profile updated successfully",
+                showConfirmButton: true
+                  });
+            //alert("Profile updated successfully!");
         }
     });
 

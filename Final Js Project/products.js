@@ -1,21 +1,7 @@
 $(function () {
   const user =JSON.parse(localStorage.getItem("loggedinUser"));
-  if(user)
-    {
-      if(user.role!=="Customer")
-      {
-        alert("you don't have access here");
-        window.location.href =window.location.origin + '/role.html';
-        return;
-      }
-    }
-    else
-    {
-        alert("please login");
-        window.location.href =window.location.origin + '/login.html';
-        return;
-    }
-  const userId=user.id;
+ //const userId=user.id;
+  
   
   $("#ForHerNav, #ForHimNav").click(function () {
     const category = this.dataset.category;   
@@ -26,6 +12,9 @@ $(function () {
    
   let contact=document.getElementById("Contact");
   contact.addEventListener("click",function(){
+    if (!checkuser(user,"Customer")) {
+        return; 
+    }
     const contactdiv=document.createElement("div");
     contactdiv.innerHTML=`
   <div class="modal" id="myModal">
@@ -65,7 +54,7 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
     if(textarea.value)
         {
         const complaints = {
-          ClientId: userId,
+          ClientId: ClientId,
           ClientName:user.name,
           Message:textarea.value
          
@@ -81,11 +70,8 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
  
     function DisplayFromLocalStorage() {
         const selectedCategory = localStorage.getItem('SelectedCategory')||[];
-        if (!user) {
-            console.error("No user logged in!");
-            return;
-        }
-        const ClientId = user.id;
+       
+    
         let products = JSON.parse(localStorage.getItem("Products"))||[];
         if (!products) {
             console.error("No products found in localStorage!");
@@ -177,6 +163,10 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
     });
 
     $(".addtocart").click(function () {
+        if (!checkuser(user,"Customer")) {
+            return; 
+        }
+        const ClientId = user.id;
         let cart = localStorage.getItem("Cart");
         let productId = String($(this).data("ProductId"));
         let selectedProduct = filteredProducts.find(function (product) {
@@ -200,18 +190,35 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
             if (existingProduct.quantity < selectedProduct.quantity) {
                 existingProduct.quantity += data.quantity;
             } else {
-                alert("No more stock available for this product!");
+                Swal.fire({
+                    icon: 'warning',
+                    title: "No more stock available for this product",
+                    showConfirmButton: true
+                });
                 return;
             }
         } else {
             cart.push(data);
         }
         localStorage.setItem("Cart", JSON.stringify(cart));
-        window.location.href =window.location.origin + '/cart.html';
+        Swal.fire({
+            icon: 'success',
+            title: "product has been added to you cart",
+            showConfirmButton: true
+        });
     });
   }
   clickButtons();
     }
-  
+    
+    
     DisplayFromLocalStorage();
+    const logoutLink = $("#logout");
+
+    logoutLink.click(function (event) {
+     
+      event.preventDefault();
+      localStorage.removeItem("loggedinUser");
+      window.location.href = "../login.html";
+    });
 });

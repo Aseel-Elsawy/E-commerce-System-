@@ -11,7 +11,7 @@ function showSlides() {
   slideIndex++;
   if (slideIndex > slides.length) { slideIndex = 1 }
   for (i = 0; i < dots.length; i++) {
-    dots[i].className = dots[i].className.replace(" active", "");
+    dots[i].className = dots[i].className.replace("active", "");
   }
   slides[slideIndex - 1].style.display = "block";
   dots[slideIndex - 1].className += " active";
@@ -45,12 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="product-prices">
             <span class="price-now">${product.price} EGP</span>
           </p>
-          <button id="AddTocartBTN-${product.ProductId}" class="shop-now" data-product-id="${product.ProductId}">Add To Cart</button>
+          <button id="${product.ProductId}" class="shop-now" data-product-id="${product.ProductId}">Add To Cart</button>
         </div>`;
        
     track.appendChild(productDiv);
     if (product.quantity < 1) {
-      const AddTocartBTN = document.querySelector(`#AddTocartBTN-${product.ProductId}`);
+      const AddTocartBTN = document.querySelector(`#${product.ProductId}`);
       if (AddTocartBTN) {
         AddTocartBTN.innerHTML = "Sold Out";
         AddTocartBTN.classList.add("disabled");
@@ -100,22 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   nextButton.addEventListener("click", slideNext);
   prevButton.addEventListener("click", slidePrev);
   
-  const user =JSON.parse (localStorage.getItem("loggedinUser"));
-  if(user)
-    {
-      if(user.role!=="Customer")
-      {
-        alert("you don't have access here");
-        window.location.href =window.location.origin + '/login.html';
-        
-      }
-    }
-    else
-    {
-        alert("please login");
-        window.location.href =window.location.origin + '/login.html';
-       
-    }
+  const user =JSON.parse (localStorage.getItem("loggedinUser"))||[];
 
   const imgHer=document.getElementById('imgHer');
   if (imgHer) {
@@ -144,10 +129,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
   
-  
-  const userId=user.id;
+const userId=user.id;
+ 
   let contact=document.getElementById("Contact");
   contact.addEventListener("click",function(){
+    if (!checkuser(user,"Customer")) {
+      return; 
+  }
+  
     const contactdiv=document.createElement("div");
     contactdiv.innerHTML=`
   <div class="modal" id="myModal">
@@ -201,9 +190,12 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
   
   });
  
- 
+
   document.querySelectorAll('.shop-now').forEach(button => {
     button.addEventListener('click', function () {
+      if (!checkuser(user,"Customer")) {
+        return; 
+    }
       const productId =this.dataset.productId;
     
       let cart = JSON.parse(localStorage.getItem("Cart")) || [];
@@ -221,7 +213,11 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
         if (cart[existingCartItemIndex].quantity < selectedProduct.quantity) {
           cart[existingCartItemIndex].quantity += 1;
         } else {
-          alert("No more stock available for this product!");
+          Swal.fire({
+            icon: 'warning',
+            title: "No more stock available for this product",
+            showConfirmButton: true
+        });
           return;
         }
       } else {
@@ -234,14 +230,19 @@ var Complaints=JSON.parse(localStorage.getItem("Complaints")) || [];
       }
 
       localStorage.setItem("Cart", JSON.stringify(cart));
-      alert("Product has been added to your cart!");
+      Swal.fire({
+        icon: 'success',
+        title: "product has been added to you cart",
+        showConfirmButton: true
+    });
     });
   });
-
+ 
  
   const logoutLink = document.getElementById("logout");
 
     logoutLink.addEventListener('click', (event) => {
+  
         event.preventDefault(); 
         localStorage.removeItem('loggedinUser'); 
         window.location.href = '../login.html'; 

@@ -1,17 +1,6 @@
 $(function () {
   const currentUser = JSON.parse(localStorage.getItem("loggedinUser"));
-  if (currentUser) {
-    if (currentUser.role !== "Admin") {
-      alert("you don't have access here");
-      window.location.href = window.location.origin + '/login.html';
-      return;
-    }
-  }
-  else {
-    alert("please login");
-    return;
-
-  }
+  checkuser(currentUser,"Admin");
   const toggleBtn = document.getElementById("toggle-btn");
   const sidebar = document.getElementById("sidebar");
 
@@ -28,7 +17,7 @@ $(function () {
     }
   });
 
-  const sellerName = currentUser.name || 'Seller';
+  const sellerName = currentUser.name || 'Admin';
   document.querySelector('.navbar-custom h5').textContent = `Welcome, ${sellerName}`;
   document.addEventListener("DOMContentLoaded", () => {
     const links = document.querySelectorAll(".nav-link");

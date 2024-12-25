@@ -20,11 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
-    if (!loggedInUser || loggedInUser.role !== "Seller") {
-        alert("You are not authorized to access this page. Redirecting to login...");
-        window.location.href = "login.html";
-        return;
-    }
+    checkuser(loggedInUser,"Seller");
 
    
     document.getElementById("name").value = loggedInUser.name || "";
@@ -102,7 +98,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (loggedInUser.status !== "active") {
                 loggedInUser.status = "not active";
-                alert("Your registration request has been submitted. Please try logging in after 24 hours.");
+                Swal.fire({
+                    icon: 'success',
+                    title: "Your registration request has been submitted. Please try logging in after 24 hours.",
+                    showConfirmButton: true
+                });
+            
             }
 
          
@@ -112,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 localStorage.setItem("users", JSON.stringify(users));
             }
 
-            localStorage.setItem("loggedinUser", JSON.stringify(loggedinUser));
+            localStorage.setItem("loggedinUser", JSON.stringify(loggedInUser));
         }
      
         const alertBox = document.createElement('div');
@@ -142,10 +143,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     document.getElementById("logoutButton").addEventListener("click", function() {
-        alert("See You Soon....")
-        localStorage.removeItem("loggedinUser");
-        window.location.href = "login.html";  
-      });
-
+        const alertBox = document.createElement('div');
+        alertBox.className = 'cool-alert';
+        alertBox.innerHTML = `
+            <div class="cool-alert-content">
+                <h2>See You Soon....</h2>
+                <p>We gonna miss you 😭.</p>
+                <button id="closeAlert">Close</button>
+            </div>`;
+    
+        document.body.appendChild(alertBox);
+    
+        document.getElementById("closeAlert").addEventListener("click", function() {
+            alertBox.remove(); 
+            localStorage.removeItem('loggedinUser'); 
+            window.location.href = '../login.html'; 
+        });
+    });
+    
+    
+       
 
 });

@@ -1,20 +1,7 @@
 
 $(function () {
     const currentUser = JSON.parse(localStorage.getItem("loggedinUser"));
-    if (currentUser) {
-        if (currentUser.role !== "Admin") {
-            alert("you don't have access here");
-            window.location.href = window.location.origin + '/login.html';
-            return;
-
-        }
-    }
-    else {
-        alert("please login");
-        window.location.href = window.location.origin + '/login.html';
-        return;
-
-    }
+    checkuser(currentUser,"Admin");
     const toggleBtn = document.getElementById("toggle-btn");
     const sidebar = document.getElementById("sidebar");
 
@@ -31,7 +18,7 @@ $(function () {
     });
 
 
-    const sellerName = currentUser.name || 'Seller';
+    const sellerName = currentUser.name ||'Admin';
     document.querySelector('.navbar-custom h5').textContent = `Welcome, ${sellerName}`;
     document.addEventListener("DOMContentLoaded", () => {
         const links = document.querySelectorAll(".nav-link");
@@ -84,41 +71,51 @@ $(function () {
 
            
             let actionsCol = $("<td>").addClass("align-middle ");
-            let deleteimg = $("<i>").addClass("fa-solid fa-trash-can");
+            let deleteimg = $("<i>").addClass("fa-solid fa-trash-can  trash");
 
             deleteimg.click(function () {
-                products = products.filter(function (p) {
-                    return !(p.ProductId === product.ProductId);
-                });
-                let orders = JSON.parse(localStorage.getItem("Orders"));
-                orders = orders.filter(function (order) {
-
-                    if (order.status === 0) {
-                        order.items = order.items.filter(function (item) {
-                            if (item.ProductId === product.ProductId && item.status === 0) {
-                                order.total -= (item.price * item.quantity);
-                                return false;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This action cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        products = products.filter(function (p) {
+                            return !(p.ProductId === product.ProductId);
+                        });
+            
+                        let orders = JSON.parse(localStorage.getItem("Orders"))||[];
+                        orders = orders.filter(function (order) {
+                            if (order.status === 0) {
+                                order.items = order.items.filter(function (item) {
+                                    if (item.ProductId === product.ProductId && item.status === 0) {
+                                        order.total -= (item.price * item.quantity);
+                                        return false;
+                                    }
+                                    return true;
+                                });
+                                return order.items.length > 0;
                             }
                             return true;
-
                         });
-                        return order.items.length > 0;
-                    }
-
-                    return true;
-                });
-
-
-
-               
-                localStorage.setItem("Products", JSON.stringify(products));
-                localStorage.setItem("Orders", JSON.stringify(orders));
-
-         
-                displayProducts();
-            });
-
-
+            
+                        localStorage.setItem("Products", JSON.stringify(products));
+                        localStorage.setItem("Orders", JSON.stringify(orders));
+            
+                        displayProducts(); // Refresh product display
+                        Swal.fire(
+                            'Deleted!',
+                            'The product has been deleted.',
+                            'success'
+                        );//end of alert
+                    } 
+                });//end of then
+            });//end of function
+            
 
             actionsCol.append(deleteimg);
 
